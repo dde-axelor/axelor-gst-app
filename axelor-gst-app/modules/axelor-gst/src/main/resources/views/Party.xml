@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+  
+  <selection name="select-party-type">
+  	<option value="individual">Individual</option>
+  	<option value="company">Company</option>
+  </selection>
+  
+  <grid model="com.axelor.gst.app.Party" title="Parties" name="party-grid">
+  	<field name="reference"/>
+  	<field name="name"/>
+  	<field name="type"/>
+  	<field name="customer"/>
+  	<field name="supplier"/>
+  	<field name="gstin"/>
+  	<field name="contact"/>
+  	<field name="address"/>
+  </grid>
+  
+  <form model="com.axelor.gst.app.Party" title="Parties" name="party-form">
+  	<panel title="Party">
+  		<field name="reference"/>
+  		<field name="name"/>
+  		<field name="type"/>
+  		<field name="customer"/>
+  		<field name="supplier"/>
+  		<field name="gstin"/>	
+  	</panel>
+  	
+  	<panel>
+  		  <field name="contact" colSpan="12">
+  			<editor>
+  				<field name="name" />
+  				<field name="type"/>
+  				<field name="primaryPhone"/>
+  				<field name="secondaryPhone"/>
+  				<field name="primaryEmail"/>
+  				<field name="secondaryEmail"/>
+  			</editor>
+  		</field>
+  	</panel>
+  	
+  	<panel>
+  		<field name="address" colSpan="12">
+  			<editor>
+  				<field name="type"/>
+  				<field name="line1"/>
+  				<field name="line2"/>
+  				<field name="city"/>
+  				<field name="state"/>
+  				<field name="country"/>
+  				<field name="pinCode"/>
+  				<field name="party"/>
+  			</editor>
+  		</field>
+  	</panel>
+  </form>
+  
+  <cards name="party-cards" model="com.axelor.gst.app.Party" title="Parties">
+  	<field name="reference"/>
+  	<field name="name"/>
+  	<field name="type"/>
+  	<field name="customer"/>
+  	<field name="supplier"/>
+  	<field name="gstin"/>
+  	
+  	<template>
+  		<![CDATA[
+  			<div style="text-align:center; color:blue">
+  				<h3><u>{{name}}</u></h3>
+  				Type: {{type}}<br>
+  				GSTIN: {{gstin}}
+  			</div>
+  		]]>
+  	</template>
+  </cards>
+  
+ </object-views>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+  
+  <selection name="select-invoice-status">
+  	<option value="draft">Draft</option>
+  	<option value="validated">Validated</option>
+  	<option value="paid">Paid</option>
+  	<option value="cancelled">Cancelled</option>
+  </selection>
+  
+  <grid model="com.axelor.gst.app.Invoice" title="Invoices" name="invoice-grid">
+  	<field name="status"/>
+  	<field name="company"/>
+  	<field name="reference"/>
+  	<field name="invoiceDate"/>
+  	<field name="priority"/>
+  	<field name="party"/>
+  	<field name="partyContact"/>
+  	<field name="invoiceAddress"/>
+  	<field name="shippingAddress"/>
+  	<field name="useInvoiceAddressAsShipping"/>
+  	<field name="netAmount"/>
+  	<field name="netIgst" />
+  	<field name="netCgst" />
+  	<field name="netSgst" />
+  	<field name="grossAmount" />
+  	<field name="invoiceItem"/>
+  </grid>
+  
+  <form model="com.axelor.gst.app.Invoice" title="Invoices" name="invoice-form" onNew="action-set-default-value" onSave="action-set-invoice-net-amounts">
+  	<panel title="Invoice">
+  		<field name="status" readonly="true" widget="NavSelect" colSpan="8"/>
+  		<field name="company"/>
+  		<field name="reference"/>
+  		<field name="invoiceDate"/>
+  		<field name="priority"/>
+  		<field name="party" onChange="action-set-contact"/>
+  		<field name="partyContact" domain="self.party=:party"/>
+  		<field name="invoiceAddress" domain="self.party=:party"/>
+  		<field name="shippingAddress" domain="self.party=:party"/>
+  		<field name="useInvoiceAddressAsShipping" onChange="action-check-value"/>
+  		<field name="netAmount" readonly="true"/>
+  		<field name="netIgst" readonly="true"/>
+  		<field name="netCgst" readonly="true"/>
+  		<field name="netSgst" readonly="true"/>
+  		<field name="grossAmount" readonly="true"/> 		
+  	</panel>
+  	<panel-related field="invoiceItem" onChange="action-set-invoice-net-amounts"/>
+  </form>
+  
+  <kanban columnBy="status" model="com.axelor.gst.app.Invoice" sequenceBy="priority" title="Invoices" name="invoice-kanban">
+  	<field name="company"/>
+  	<field name="party"/>
+  	<template>
+  		<![CDATA[
+  			<div style="text-align:center;">
+  				Company: {{company.name}}<br>
+  				Party: {{party.name}}
+  			</div>
+  		]]>
+  	</template>
+  </kanban>
+  
+  <action-attrs name="action-set-party-contact">
+  	<attribute name="value" for="partyContact" expr="eval:party.contact"/>
+  </action-attrs>
+  
+  <action-attrs name="action-set-default-value">
+  	<attribute name="value" for="invoiceDate" expr="eval:__datetime__"/>
+  	<attribute name="value" for="company" expr="eval:__repo__(Company).all().fetchOne()"/>
+  </action-attrs>
+  
+  <action-attrs name="action-check-value">
+  	<attribute name="hidden" for="shippingAddress" expr="eval:__this__.invoiceAddress" if="useInvoiceAddressAsShipping"/>
+  	<attribute name="value" for="shippingAddress" expr="eval:__this__.invoiceAddress" if="useInvoiceAddressAsShipping"/>
+  </action-attrs>
+  
+ <action-method name="action-set-contact">
+   <call class="com.axelor.gst.controller.InvoiceController" method="setContact"/>
+  </action-method>
+
+  
+  <action-method name="action-set-invoice-net-amounts">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="setAmounts"/>
+  </action-method>
+  
+  
+ </object-views>
