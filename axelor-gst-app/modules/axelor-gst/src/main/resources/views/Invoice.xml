@@ -28,25 +28,34 @@
   	<field name="invoiceItem"/>
   </grid>
   
-  <form model="com.axelor.gst.app.Invoice" title="Invoices" name="invoice-form" onNew="action-set-default-value" onSave="action-set-invoice-net-amounts">
+  <form model="com.axelor.gst.app.Invoice" title="Invoices" name="invoice-form" onNew="action-group-on-new-from,action-group-for-change-amounts"  onSave="action-method-set-invoice-net-amounts">
+  	<toolbar>
+  		<button onClick="action-print-invoice" name="printInvoice" icon="fa-print"/>
+  	</toolbar>
+  	<panel sidebar="true">
+  		<button onClick="save,action-record-change-status-draft,save" name="dratftBtn" title="Return To Draft" icon="fa-retweet" hideIf="status==&quot;draft&quot; || status==&quot;validated&quot; || status==&quot;paid&quot;"/>
+  		<button onClick="save,action-record-change-record-status-validated,action-method-set-reference,save" name="validateBtn" title="Validate" icon="fa-paper-plane" hideIf="status==&quot;validated&quot; || status==&quot;paid&quot; || status==&quot;cancelled&quot;"/>
+  		<button onClick="save,action-record-change-status-paid,save" name="paidBtn" title="Paid" css="btn btn-success" icon="fa-check-square-o" hideIf="status==&quot;paid&quot; || status==&quot;draft&quot; || status==&quot;cancelled&quot;"/>
+  		<button onClick="save,action-record-change-status-cancel,save" name="cancelBtn" title="Cancel" icon="fa-times" css="btn btn-danger" hideIf="status==&quot;cancelled&quot;"/>
+  	</panel>
   	<panel title="Invoice">
   		<field name="status" readonly="true" widget="NavSelect" colSpan="8"/>
-  		<field name="company"/>
+  		<field name="company" onChange="action-group-for-change-amounts"/>
   		<field name="reference"/>
   		<field name="invoiceDate"/>
   		<field name="priority"/>
-  		<field name="party" onChange="action-set-contact"/>
-  		<field name="partyContact" domain="self.party=:party"/>
-  		<field name="invoiceAddress" domain="self.party=:party"/>
+  		<field name="party" onChange="action-method-set-contact,action-group-for-change-amounts"/>
+  		<field name="partyContact" domain="self.party=:party" onChange="action-method-change-amounts-on-change,action-method-set-invoice-net-amounts"/>
+  		<field name="invoiceAddress" domain="self.party=:party" onChange="action-group-for-change-amounts"/>
   		<field name="shippingAddress" domain="self.party=:party"/>
-  		<field name="useInvoiceAddressAsShipping" onChange="action-check-value"/>
+  		<field name="useInvoiceAddressAsShipping" onChange="action-attr-check-value"/>
   		<field name="netAmount" readonly="true"/>
   		<field name="netIgst" readonly="true"/>
   		<field name="netCgst" readonly="true"/>
   		<field name="netSgst" readonly="true"/>
   		<field name="grossAmount" readonly="true"/> 		
   	</panel>
-  	<panel-related field="invoiceItem" onChange="action-set-invoice-net-amounts"/>
+  	<panel-related field="invoiceItem" onChange="action-method-set-invoice-net-amounts"/>
   </form>
   
   <kanban columnBy="status" model="com.axelor.gst.app.Invoice" sequenceBy="priority" title="Invoices" name="invoice-kanban">
@@ -62,28 +71,170 @@
   	</template>
   </kanban>
   
-  <action-attrs name="action-set-party-contact">
+  <chart name="invoice-unpaid-customer-chart" title="Unpaid invoices per customer" onInit="action-method-set-dummy-field-for-chart">
+  	<search-fields>
+  		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
+  		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
+  	</search-fields>
+  	<dataset type="jpql">
+  		<![CDATA[
+  			Select p.name as customer,count(i) as total 
+  			from Invoice as i,Party as p
+  			where i.party = p.id and i.status not in ('paid','cancelled') and i.invoiceDate between date(:fromDate) and date(:toDate)
+  			group by p
+  		]]>
+  	</dataset>
+  	<category key="customer" title="Customers"/>
+  	<series key="total" type="bar" title=""/>
+  </chart>
+  
+  <chart name="invoice-customer-per-status-chart" title="Customers per state">
+  	<dataset type="jpql">
+  		<![CDATA[
+  			Select s.name as state,count(p) as total
+  			From Invoice as i,Address as a, State as s,Party as p
+  			where p.id=i.party  and s.id=a.state and a.id=i.invoiceAddress
+  			group by s
+  		]]>
+  	</dataset>
+  	<category key="state"/>
+  	<series key="total" type="pie"/>
+  </chart>
+  
+  <chart name="invoice-per-status-amount-chart" title="Amounts per invoice status ">
+  	<dataset type="jpql">
+  		<![CDATA[
+  			Select i.status as status,sum(i.grossAmount) as amount
+  			From Invoice as i
+  			Group by status
+  		]]>
+  	</dataset>
+  	<category key="status" title="Status"/>
+  	<series key="amount" type="bar" title="Amounts"/>
+  </chart>
+  
+  <chart name="invoice-per-status-chart" title="Number of invoices per invoice status ">
+  	<dataset type="jpql">
+  		<![CDATA[
+  			Select i.status as status,count(i) as total
+  			From Invoice as i
+  			Group by status
+  		]]>
+  	</dataset>
+  	<category key="status"/>
+  	<series key="total" type="line"/>
+  </chart>
+  
+  <chart name="paid-invoice-per-category-per-product" title="Paid invoices per category per product" onInit="action-method-set-dummy-field-for-chart">
+  	<search-fields>
+  		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
+  		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
+  	</search-fields>
+  	<dataset type="sql">
+  		<![CDATA[
+			select count(*) as total,ap.name as pname,apc.name as cname
+  	from axelor_invoice ai 
+  		left join axelor_invoice_line ail 
+  		on ai.id=ail.invoice 
+  		left join axelor_product ap 
+  		on ap.id=ail.product 
+  		left join axelor_product_category apc 
+  		on apc.id=ap.category 
+  	where ai.status='paid'
+  	group by apc.id,ap.id;
+  		]]>
+  	</dataset>
+  	<category key="pname" title="Products"/>
+  	<series key="total" type="bar" groupBy="cname" title="No. of Invoices"/>
+  </chart>
+  
+  <action-method name="action-method-set-values-from-product">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="setInvoiceItem"/>
+  </action-method>
+  
+  <action-attrs name="action-attr-check-null-values">
+  	<attribute name="readonly" for="invoiceItem" expr="true" if="invoiceAddress==null || company==null"/>
+  	<attribute name="readonly" for="invoiceItem" expr="false" if="invoiceAddress!=null &amp;&amp; company!=null"/>
+  </action-attrs>
+  
+  <action-attrs name="action-attr-set-party-contact">
   	<attribute name="value" for="partyContact" expr="eval:party.contact"/>
   </action-attrs>
   
-  <action-attrs name="action-set-default-value">
+  <action-attrs name="action-attr-set-default-value">
   	<attribute name="value" for="invoiceDate" expr="eval:__datetime__"/>
   	<attribute name="value" for="company" expr="eval:__repo__(Company).all().fetchOne()"/>
   </action-attrs>
   
-  <action-attrs name="action-check-value">
+  <action-attrs name="action-attr-check-value">
   	<attribute name="hidden" for="shippingAddress" expr="eval:__this__.invoiceAddress" if="useInvoiceAddressAsShipping"/>
   	<attribute name="value" for="shippingAddress" expr="eval:__this__.invoiceAddress" if="useInvoiceAddressAsShipping"/>
   </action-attrs>
   
- <action-method name="action-set-contact">
+  <action-record name="action-record-change-status-draft" model="com.axelor.gst.app.Invoice">
+  	<field name="status" expr="draft"/>
+  </action-record>
+  
+  <action-record name="action-record-change-record-status-validated" model="com.axelor.gst.app.Invoice">
+  	<field name="status" expr="validated"/>
+  </action-record>
+  
+  <action-record name="action-record-change-status-paid" model="com.axelor.gst.app.Invoice">
+  	<field name="status" expr="paid"/>
+  </action-record>
+  
+  <action-record name="action-record-change-status-cancel" model="com.axelor.gst.app.Invoice">
+  	<field name="status" expr="cancelled"/>
+  </action-record>
+  
+  <action-method name="action-method-set-gst-values-to-zero">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="setGst" />
+  </action-method>
+  
+ <action-method name="action-method-set-contact">
    <call class="com.axelor.gst.controller.InvoiceController" method="setContact"/>
+  </action-method>
+  
+  <action-method name="action-method-check-invoice-items">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="checkInvoiceLine"/>
+  </action-method>
+  
+  <action-method name="action-method-set-reference">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="setReference"/>
   </action-method>
 
   
-  <action-method name="action-set-invoice-net-amounts">
+  <action-method name="action-method-set-invoice-net-amounts">
   	<call class="com.axelor.gst.controller.InvoiceController" method="setAmounts"/>
   </action-method>
   
+  <action-method name="action-method-change-amounts-on-change">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="setValuesOnChange"/>
+  </action-method>
   
+  <action-record name="action-method-set-dummy-field-for-chart" model="com.axelor.gst.app.Invoice">
+  	<field name="fromDate" expr="call:com.axelor.gst.controller.InvoiceController:setFromDate()"/>
+  	<field name="toDate" expr="eval:__datetime__"/>
+  </action-record>
+  
+  <action-group name="action-group-on-new-from">
+  	<action name="action-attr-set-default-value"/>
+  	<action name="action-method-set-values-from-product"  if="productId!=null"/>
+  	<action name="action-attr-check-null-values"/>
+  </action-group>
+  
+  <action-group name="action-group-for-change-amounts">
+  	<action name="action-attr-check-null-values" />
+  	<action name="action-method-set-gst-values-to-zero"/>
+  	<action name="action-method-change-amounts-on-change"/>
+  	<action name="action-method-set-invoice-net-amounts"/>
+  </action-group>
+  
+  <action-report output="invoice-${date}${time}" name="action-print-invoice" design="invoice.rptdesign" format="pdf">
+  	<param name="companyId" expr="eval:company.id"/>
+  	<param name="invoiceId" expr="eval:id"/>
+  	<param name="partyId" expr="eval:party.id"/>
+  	<param name="addressId" expr="eval:invoiceAddress.id"/>
+  	<param name="logoUrl" expr="call:com.axelor.gst.controller.InvoiceController:getLogoUrl()"/>
+  </action-report>
  </object-views>

@@ -36,44 +36,35 @@ public class InvoiceLineController {
 	
 	
 	
-	public boolean checkState(ActionRequest req,ActionResponse resp) {
-		InvoiceLine invoiceLine=req.getContext().asType(InvoiceLine.class);
-		Invoice invoice=invoiceLine.getInvoice();
-		Address companyAddress=invoice.getCompany().getAddress();
-		Address invoiceAddress=invoice.getInvoiceAddress();
-		if(service.checkState(companyAddress.getState(),invoiceAddress.getState())) {
-			return true;
-		}
-		return false;
-	}
-	
-	
 	
 	public void setGst(ActionRequest req,ActionResponse resp) {
 		InvoiceLine invoiceLine=req.getContext().asType(InvoiceLine.class);
-		Invoice invoice=invoiceLine.getInvoice();
+		Invoice invoice=req.getContext().getParent().asType(Invoice.class);
 		try {
 			Address companyAddress=invoice.getCompany().getAddress();
 			Address invoiceAddress=invoice.getInvoiceAddress();
-			BigDecimal net_amount=invoiceLine.getNetAmount();
-			BigDecimal gstRate=invoiceLine.getGstRate();
-			BigDecimal igst=net_amount.multiply(gstRate);
+			BigDecimal netAmount=invoiceLine.getNetAmount();
+			BigDecimal gstRate=invoiceLine.getGstRate().divide(BigDecimal.valueOf(100));
+			BigDecimal igst=netAmount.multiply(gstRate);
 			BigDecimal gst=igst.divide(BigDecimal.valueOf(2));
-			BigDecimal grossAmount=net_amount;
+			BigDecimal grossAmount=netAmount;
 			if(service.checkState(companyAddress.getState(), invoiceAddress.getState())) {
 				resp.setValue("sgst", gst);
+				grossAmount=grossAmount.add(gst);
+				resp.setValue("cgst", gst);
 				grossAmount=grossAmount.add(gst);
 			}
 			else {
 				resp.setValue("igst", igst);
 				grossAmount=grossAmount.add(igst);
 			}
-			resp.setValue("cgst", gst);
-			grossAmount=grossAmount.add(gst);
 			resp.setValue("grossAmount", grossAmount);
 		}catch(Exception e) {
 			
 		}	
 	}
+	
+	
+
 
 }

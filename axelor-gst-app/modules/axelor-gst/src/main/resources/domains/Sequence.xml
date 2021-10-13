@@ -9,17 +9,7 @@
   	<string name="prefix"/>
   	<string name="suffix"/>
   	<integer name="padding" min="1" max="10"/>
-  	<string name="nextNumber" search="prefix,suffix,padding">
-  		<![CDATA[
-  			String nextNumber=prefix;
-  			for(int i=1;i<padding;i++)
-  			{
-  				nextNumber+="0";
-  			}
-  			nextNumber+=suffix;
-  			return nextNumber;
-  		]]>
-  	</string>
+  	<string name="nextNumber"/>
   	<many-to-one ref="com.axelor.meta.db.MetaModel" name="model" required="true"/>
   </entity>
   
