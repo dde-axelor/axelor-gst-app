@@ -66,12 +66,6 @@
   <action-report output="product-${date}${time}" name="action-report-print-product-details" design="product.rptdesign" format="pdf">
   	<param name="logoUrl" expr="call:com.axelor.gst.controller.InvoiceController:getLogoUrl()"/>
   	<param name="companyId" expr="eval:__repo__(Company).all().fetchOne().id"/>
-  	<!-- <param name="productId" expr="eval:id"/>
-  	<param name="hsbn" expr="eval:hsbn"/>
-  	<param name="name" expr="eval:name"/>
-  	<param name="code" expr="eval:code"/>
-  	<param name="salePrice" expr="eval:salePrice"/>
-  	<param name="costPrice" expr="eval:costPrice"/> -->
   </action-report>
   
  </object-views>

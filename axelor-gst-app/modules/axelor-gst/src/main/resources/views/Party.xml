@@ -18,7 +18,7 @@
   	<field name="address"/>
   </grid>
   
-  <form model="com.axelor.gst.app.Party" title="Parties" name="party-form">
+  <form model="com.axelor.gst.app.Party" title="Parties" name="party-form" onSave="action-method-set-reference">
   	<panel title="Party">
   		<field name="reference"/>
   		<field name="name"/>
@@ -75,5 +75,9 @@
   		]]>
   	</template>
   </cards>
+  
+  <action-method name="action-party-method-set-reference">
+  	<call class="com.axelor.gst.controller.PartyController" method="setPartyReference"/>
+  </action-method>
   
  </object-views>

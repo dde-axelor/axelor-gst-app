@@ -12,7 +12,9 @@ public class SequenceController {
 	private SequenceService service;
 	
 	public void getSequence(ActionRequest req,ActionResponse resp) {
+		
 		Sequence sequence = req.getContext().asType(Sequence.class);
+		
 		resp.setValue("nextNumber", (service.getNextNumber(sequence)));
 	}
 }

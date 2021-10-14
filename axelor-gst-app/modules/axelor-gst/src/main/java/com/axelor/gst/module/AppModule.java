@@ -3,6 +3,7 @@ package com.axelor.gst.module;
 import com.axelor.app.AxelorModule;
 import com.axelor.gst.controller.InvoiceController;
 import com.axelor.gst.controller.InvoiceLineController;
+import com.axelor.gst.controller.PartyController;
 import com.axelor.gst.controller.SequenceController;
 import com.axelor.gst.service.InvoiceLineService;
 import com.axelor.gst.service.InvoiceLineServiceImplementation;
@@ -18,6 +19,7 @@ public class AppModule extends AxelorModule{
 		bind(InvoiceController.class);
 		bind(InvoiceLineController.class);
 		bind(SequenceController.class);
+		bind(PartyController.class);
 		bind(InvoiceService.class).to(InvoiceServiceImplementation.class);
 		bind(InvoiceLineService.class).to(InvoiceLineServiceImplementation.class);
 		bind(SequenceService.class).to(SequenceServiceImplementation.class);

@@ -34,7 +34,7 @@
   	</toolbar>
   	<panel sidebar="true">
   		<button onClick="save,action-record-change-status-draft,save" name="dratftBtn" title="Return To Draft" icon="fa-retweet" hideIf="status==&quot;draft&quot; || status==&quot;validated&quot; || status==&quot;paid&quot;"/>
-  		<button onClick="save,action-record-change-record-status-validated,action-method-set-reference,save" name="validateBtn" title="Validate" icon="fa-paper-plane" hideIf="status==&quot;validated&quot; || status==&quot;paid&quot; || status==&quot;cancelled&quot;"/>
+  		<button onClick="save,action-record-change-record-status-validated,action-invoice-method-set-reference,save" name="validateBtn" title="Validate" icon="fa-paper-plane" hideIf="status==&quot;validated&quot; || status==&quot;paid&quot; || status==&quot;cancelled&quot;"/>
   		<button onClick="save,action-record-change-status-paid,save" name="paidBtn" title="Paid" css="btn btn-success" icon="fa-check-square-o" hideIf="status==&quot;paid&quot; || status==&quot;draft&quot; || status==&quot;cancelled&quot;"/>
   		<button onClick="save,action-record-change-status-cancel,save" name="cancelBtn" title="Cancel" icon="fa-times" css="btn btn-danger" hideIf="status==&quot;cancelled&quot;"/>
   	</panel>
@@ -71,7 +71,7 @@
   	</template>
   </kanban>
   
-  <chart name="invoice-unpaid-customer-chart" title="Unpaid invoices per customer" onInit="action-method-set-dummy-field-for-chart">
+  <chart name="unpaid-invoice-per-customer-chart" title="Unpaid invoices per customer" onInit="action-method-set-dummy-field-for-chart">
   	<search-fields>
   		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
   		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
@@ -88,7 +88,7 @@
   	<series key="total" type="bar" title=""/>
   </chart>
   
-  <chart name="invoice-customer-per-status-chart" title="Customers per state">
+  <chart name="customer-per-state-chart" title="Customers per state">
   	<dataset type="jpql">
   		<![CDATA[
   			Select s.name as state,count(p) as total
@@ -133,15 +133,15 @@
   	<dataset type="sql">
   		<![CDATA[
 			select count(*) as total,ap.name as pname,apc.name as cname
-  	from axelor_invoice ai 
-  		left join axelor_invoice_line ail 
-  		on ai.id=ail.invoice 
-  		left join axelor_product ap 
-  		on ap.id=ail.product 
-  		left join axelor_product_category apc 
-  		on apc.id=ap.category 
-  	where ai.status='paid'
-  	group by apc.id,ap.id;
+  			from axelor_invoice ai 
+  			left join axelor_invoice_line ail 
+  				on ai.id=ail.invoice 
+  			left join axelor_product ap 
+  				on ap.id=ail.product 
+  			left join axelor_product_category apc 
+  				on apc.id=ap.category 
+  			where ai.status='paid' and ai.invoice_date between date(:fromDate) and date(:toDate)
+  			group by apc.id,ap.id;
   		]]>
   	</dataset>
   	<category key="pname" title="Products"/>
@@ -195,12 +195,9 @@
    <call class="com.axelor.gst.controller.InvoiceController" method="setContact"/>
   </action-method>
   
-  <action-method name="action-method-check-invoice-items">
-  	<call class="com.axelor.gst.controller.InvoiceController" method="checkInvoiceLine"/>
-  </action-method>
   
-  <action-method name="action-method-set-reference">
-  	<call class="com.axelor.gst.controller.InvoiceController" method="setReference"/>
+  <action-method name="action-invoice-method-set-reference">
+  	<call class="com.axelor.gst.controller.InvoiceController" method="setInvoiceReference"/>
   </action-method>
 
   

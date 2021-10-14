@@ -5,22 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.axelor.gst.app.Address;
+import com.axelor.gst.app.Contact;
 import com.axelor.gst.app.Invoice;
 import com.axelor.gst.app.InvoiceLine;
+import com.axelor.gst.app.Party;
 import com.axelor.gst.app.Product;
 import com.axelor.gst.app.repo.ProductRepository;
 import com.axelor.inject.Beans;
 
 public class InvoiceServiceImplementation implements InvoiceService {
 
-	@Override
-	public BigDecimal totalAmount(List<BigDecimal> amount) {
-		BigDecimal total=BigDecimal.valueOf(0);
-		for(BigDecimal value:amount) {
-			total=total.add(value);
-		}
-		return total;
-	}
 	
 	@Override
 	public boolean checkString(String s1, String s2) {
@@ -42,9 +36,6 @@ public class InvoiceServiceImplementation implements InvoiceService {
 		BigDecimal igst=BigDecimal.ZERO;
 		BigDecimal sgst=BigDecimal.ZERO;
 		BigDecimal cgst=BigDecimal.ZERO;
-		System.out.println(invoice.getCompany());
-		System.out.println(invoice.getParty());
-		System.out.println(invoice.getInvoiceAddress());
 		try {
 			if(invoice.getCompany().equals(null) || invoice.getInvoiceAddress().equals(null) || invoice.getParty().equals(null)) {
 				invoiceItems=invoice.getInvoiceItem();
@@ -112,6 +103,70 @@ public class InvoiceServiceImplementation implements InvoiceService {
 		}
 		return items;
 	}
+
+	@Override
+	public Object getAddress(Party p, String str) {
+		if(str.equalsIgnoreCase("primary")) {
+			List<Contact> contactList=p.getContact();
+			Contact contact=null;
+			for(Contact c:contactList) {
+				if(checkString("primary", c.getType())) {
+					contact= c;
+				}
+			}
+			return contact;
+		}else {
+			List<Address> addressList=p.getAddress();
+			Address address=null;
+			for(Address a:addressList) {
+				if(checkString(str, a.getType())) {
+					address=a;
+					break;
+				}else if(checkString("default", a.getType())) {
+					address=a;
+				}
+			}
+			return address;
+		}
+	}
+
+	@Override
+	public BigDecimal getAmounts(List<InvoiceLine> il, String str) {
+		List<BigDecimal> list=new ArrayList <BigDecimal>();
+		if(str.equalsIgnoreCase("netAmount")) {
+			for(InvoiceLine item:il)
+				list.add(item.getNetAmount());
+		}
+		else if(str.equalsIgnoreCase("igst"))
+		{
+			for(InvoiceLine item:il)
+				list.add(item.getIgst());
+		}
+		else if(str.equalsIgnoreCase("sgst"))
+		{
+			for(InvoiceLine item:il)
+				list.add(item.getSgst());
+		}
+		else if(str.equalsIgnoreCase("cgst"))
+		{
+			for(InvoiceLine item:il)
+				list.add(item.getCgst());
+		}else if(str.equalsIgnoreCase("grossAmount"))
+		{
+			for(InvoiceLine item:il)
+				list.add(item.getGrossAmount());
+		}
+		
+		BigDecimal total=BigDecimal.valueOf(0);
+		for(BigDecimal value:list) {
+			total=total.add(value);
+		}
+		return total;
+	}
+
+	
+
+	
 
 	
 	

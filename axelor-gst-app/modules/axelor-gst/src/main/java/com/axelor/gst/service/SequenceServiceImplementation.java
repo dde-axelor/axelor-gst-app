@@ -48,7 +48,6 @@ public class SequenceServiceImplementation implements SequenceService {
 				nextNumber=getPadding(seq.getNextNumber(),seq.getPadding());
 			}
 		}
-//		System.out.println(incrementedSequence(seq));
 		return nextNumber;
 	}
 
@@ -108,6 +107,7 @@ public class SequenceServiceImplementation implements SequenceService {
 		{
 			mainSequence=incremented;
 		}
+		System.out.println(mainSequence);
 		sequence.setNextNumber(mainSequence);
 		seqRepo.save(sequence);
 		return mainSequence;
