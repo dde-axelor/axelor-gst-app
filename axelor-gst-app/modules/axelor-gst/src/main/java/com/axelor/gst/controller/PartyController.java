@@ -13,12 +13,13 @@ public class PartyController {
 	public void setPartyReference(ActionRequest req,ActionResponse resp) {
 		
 		try {
-			System.out.println("hello");
+			
 			resp.setValue("reference", sequence.getNextSequence("Party"));
+			
 		}catch(Exception e)
 		{
+			
 			resp.addError("reference", "No sequence is specified for this model");
 		}
 	}
-
 }

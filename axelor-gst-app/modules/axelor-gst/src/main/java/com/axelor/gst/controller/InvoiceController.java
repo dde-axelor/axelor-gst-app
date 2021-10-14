@@ -1,7 +1,6 @@
 package com.axelor.gst.controller;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.axelor.app.AppSettings;
@@ -96,15 +95,10 @@ public class InvoiceController {
 	
 	@CallMethod
 	public String getLogoUrl() {
-		
-		AppSettings app=AppSettings.get();
-		
-		String uploadUrl=app.get("file.upload.dir");
-		
-		uploadUrl+=File.separator;
-		
-		return uploadUrl;
+			
+		return AppSettings.get().get("file.upload.dir").concat(File.separator);
 	}
+	
 	
 	public void setGst(ActionRequest req,ActionResponse resp) {
 		
@@ -112,17 +106,5 @@ public class InvoiceController {
 		
 		resp.setValue("invoiceItem", service.invoiceItemAmounts(invoice));
 	}
-	
-	@CallMethod
-	public LocalDateTime setFromDate() {
-		
-		LocalDateTime current=LocalDateTime.now();
-		
-		long today=current.getDayOfMonth();
-		
-		LocalDateTime fromDate=current.minusDays(today-1);
-		
-		return fromDate;
-	}
-	
+
 }

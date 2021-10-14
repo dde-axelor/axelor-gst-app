@@ -16,12 +16,11 @@ public class AppModule extends AxelorModule{
 	
 	@Override
 	public void configure() {
-		bind(InvoiceController.class);
-		bind(InvoiceLineController.class);
-		bind(SequenceController.class);
-		bind(PartyController.class);
+		
 		bind(InvoiceService.class).to(InvoiceServiceImplementation.class);
+		
 		bind(InvoiceLineService.class).to(InvoiceLineServiceImplementation.class);
+		
 		bind(SequenceService.class).to(SequenceServiceImplementation.class);
 	}
 

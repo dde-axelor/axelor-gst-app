@@ -2,10 +2,8 @@ package com.axelor.gst.controller;
 
 import java.math.BigDecimal;
 
-import com.axelor.gst.app.Address;
 import com.axelor.gst.app.Invoice;
 import com.axelor.gst.app.InvoiceLine;
-import com.axelor.gst.app.Product;
 import com.axelor.gst.service.InvoiceLineService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -21,11 +19,7 @@ public class InvoiceLineController {
 		
 		InvoiceLine invoiceLine=req.getContext().asType(InvoiceLine.class);
 		
-		Product product=invoiceLine.getProduct();
-		
-		String item="["+product.getCode()+"] "+product.getName();
-		
-		resp.setValue("item", item);
+		resp.setValue("item", service.getProductCode(invoiceLine));
 	}
 	
 	
@@ -47,37 +41,14 @@ public class InvoiceLineController {
 		Invoice invoice=req.getContext().getParent().asType(Invoice.class);
 		
 		try {
-			Address companyAddress=invoice.getCompany().getAddress();
-			
-			Address invoiceAddress=invoice.getInvoiceAddress();
-			
-			BigDecimal netAmount=invoiceLine.getNetAmount();
-			
-			BigDecimal gstRate=invoiceLine.getGstRate().divide(BigDecimal.valueOf(100));
-			
-			BigDecimal igst=netAmount.multiply(gstRate);
-			
-			BigDecimal gst=igst.divide(BigDecimal.valueOf(2));
-			
-			BigDecimal grossAmount=netAmount;
-			
-			if(service.checkState(companyAddress.getState(), invoiceAddress.getState())) {
-				
-				resp.setValue("sgst", gst);
-				
-				grossAmount=grossAmount.add(gst);
-				
-				resp.setValue("cgst", gst);
-				
-				grossAmount=grossAmount.add(gst);
-			}
-			else {
-				resp.setValue("igst", igst);
-				
-				grossAmount=grossAmount.add(igst);
-			}
-			
-			resp.setValue("grossAmount", grossAmount);
+							
+			resp.setValue("sgst", service.getGstAmounts(invoice, invoiceLine).getSgst());
+		
+			resp.setValue("cgst", service.getGstAmounts(invoice, invoiceLine).getCgst());
+
+			resp.setValue("igst", service.getGstAmounts(invoice, invoiceLine).getIgst());
+		
+			resp.setValue("grossAmount", service.getGstAmounts(invoice, invoiceLine).getGrossAmount());
 			
 		}catch(Exception e) {
 			
