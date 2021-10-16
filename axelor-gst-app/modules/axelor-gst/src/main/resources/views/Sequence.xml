@@ -10,11 +10,11 @@
   	<field name="model"/>
   </grid>
   
-  <form model="com.axelor.gst.app.Sequence" title="Sequences" name="sequence-form" onSave="action-method-set-next-number">
+  <form model="com.axelor.gst.app.Sequence" title="Sequences" name="sequence-form" >
   	<panel title="Sequences">
-  		<field name="prefix"/>
-  		<field name="suffix"/>
-  		<field name="padding"/>
+  		<field name="prefix" onChange="action-method-set-next-number"/>
+  		<field name="suffix" onChange="action-method-set-next-number"/>
+  		<field name="padding" onChange="action-method-set-next-number"/>
   		<field name="nextNumber"/>
   		<field name="model"/>
   	</panel>

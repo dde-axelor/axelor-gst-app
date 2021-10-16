@@ -16,12 +16,12 @@
   	<field name="grossAmount"/>
   </grid>
   
-  <form model="com.axelor.gst.app.InvoiceLine" title="Invoice Line" name="invoice-line-form" onNew="action-group-on-new">
+  <form model="com.axelor.gst.app.InvoiceLine" title="Invoice Line" name="invoice-line-form" onNew="action-invoice-line-group-on-new">
   	<panel>
-  		<field name="product" onChange="action-method-set-code,action-record-set-product-details,action-method-group-set-values"/>
+  		<field name="product" onChange="action-invoice-line-method-set-code,action-invoice-line-record-set-product-details,action-invoice-line-group-set-values"/>
   		<field name="hsbn" readonly="true"/>
   		<field name="item" readonly="true"/>
-  		<field name="qty" onChange="action-method-group-set-values"/>
+  		<field name="qty" onChange="action-invoice-line-group-set-values"/>
   		<field name="price" readonly="true"/>
   		<field name="netAmount" readonly="true"/>
   		<field name="gstRate" readonly="true"/>
@@ -32,38 +32,38 @@
   	</panel>
   </form>
   
-  <action-record name="action-record-set-product-details" model="com.axelor.gst.app.InvoiceLine">
+  <action-record name="action-invoice-line-record-set-product-details" model="com.axelor.gst.app.InvoiceLine">
   	<field name="hsbn" expr="eval:product.hsbn"/>
   	<field name="price" expr="eval:product.salePrice"/>
   	<field name="gstRate" expr="eval:product.gstRate"/>
   	<field name="qty" expr= '1'/>
   </action-record>
   
-  <action-record name="action-record-set-price-on-new" model="com.axelor.gst.app.InvoiceLine">
+  <action-record name="action-invoice-line-record-set-price-on-new" model="com.axelor.gst.app.InvoiceLine">
   	<field name="price" expr="1"/>
   </action-record>
   
   
-  <action-method name="action-method-set-gst-amounts">
+  <action-method name="action-invoice-line-method-set-gst-amounts">
   	<call class="com.axelor.gst.controller.InvoiceLineController" method="setGst"/>
   </action-method>
   
-  <action-method name="action-method-set-code">
+  <action-method name="action-invoice-line-method-set-code">
   	<call class="com.axelor.gst.controller.InvoiceLineController" method="setItem"/>
   </action-method>
   
-  <action-method name="action-method-set-readonly-values">
+  <action-method name="action-invoice-line-method-set-readonly-values">
   	<call class="com.axelor.gst.controller.InvoiceLineController" method="setNetAmount"/>
   </action-method>
   
-  <action-group name="action-method-group-set-values">
-  	<action name="action-method-set-readonly-values"/>
-  	<action name="action-method-set-gst-amounts"/>
+  <action-group name="action-invoice-line-group-set-values">
+  	<action name="action-invoice-line-method-set-readonly-values"/>
+  	<action name="action-invoice-line-method-set-gst-amounts"/>
   </action-group>
   
-  <action-group name="action-group-on-new">
-  	<action name="action-record-set-price-on-new"/>
-  	<action name="action-record-set-product-details" if="product!=null"/>
+  <action-group name="action-invoice-line-group-on-new">
+  	<action name="action-invoice-line-record-set-price-on-new"/>
+  	<action name="action-invoice-line-record-set-product-details" if="product!=null"/>
   </action-group>
   
  </object-views>

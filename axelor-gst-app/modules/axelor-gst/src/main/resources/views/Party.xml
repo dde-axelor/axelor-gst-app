@@ -33,10 +33,10 @@
   			<editor>
   				<field name="name" />
   				<field name="type"/>
-  				<field name="primaryPhone"/>
-  				<field name="secondaryPhone"/>
-  				<field name="primaryEmail"/>
-  				<field name="secondaryEmail"/>
+  				<field name="primaryPhone" widget="phone" x-preferred-countries="IN FR"/>
+  				<field name="secondaryPhone" widget="phone" x-preferred-countries="IN FR"/>
+  				<field name="primaryEmail" widget="email"/>
+  				<field name="secondaryEmail" widget="email"/>
   			</editor>
   		</field>
   	</panel>
@@ -47,8 +47,8 @@
   				<field name="type"/>
   				<field name="line1"/>
   				<field name="line2"/>
-  				<field name="city"/>
-  				<field name="state"/>
+  				<field name="city" domain="self.state=:state" />
+  				<field name="state" domain="self.country=:country" />
   				<field name="country"/>
   				<field name="pinCode"/>
   				<field name="party"/>
@@ -77,7 +77,21 @@
   </cards>
   
   <action-method name="action-party-method-set-reference">
-  	<call class="com.axelor.gst.controller.PartyController" method="setPartyReference" if="__self__.reference==null"/>
+  	<call class="com.axelor.gst.controller.PartyController" method="setPartyReference" if="__this__.reference==null"/>
   </action-method>
+  
+  <action-condition name="action-party-condition-on-select-state">
+  	<check field="country" if="country==null" error="Fill Country"/>
+  </action-condition>
+  
+  <action-condition name="action-party-condition-on-select-city">
+  	<check field="state" if="state==null" error="Fill State"/>
+  </action-condition>
+  
+  <action-attrs name="action-party-attr-filter-records">
+  	<attribute name="readonly" for="city" expr="true" if="self.state==null"/>
+  	<attribute name="readonly" for="state" expr="true" if="self.country==null"/>
+  </action-attrs>
+  
   
  </object-views>

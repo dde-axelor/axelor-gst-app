@@ -4,8 +4,8 @@
   
   <grid model="com.axelor.gst.app.Product" title="Products" name="product-grid">
   	<toolbar>
-  		<button onClick="action-view-create-new-invoice" name="createInvoice" icon="fa-pencil-square" title="Creat"/>
-  		<button onClick="action-report-print-product-details" name="printBtn" icon="fa-print"/>
+  		<button onClick="action-product-view-create-new-invoice" name="createInvoice" icon="fa-pencil-square" title="Creat"/>
+  		<button onClick="action-product-report-print-product-details" name="printBtn" icon="fa-print"/>
   	</toolbar>
   	<field name="name"/>
   	<field name="code"/>
@@ -21,7 +21,7 @@
   		<field name="name"/>
   		<field name="code"/>
   		<field name="hsbn"/>
-  		<field name="category" onChange="action-record-change-gst-rate"/>
+  		<field name="category" onChange="action-product-record-change-gst-rate"/>
   		<field name="salePrice"/>
   		<field name="costPrice"/>
   		<field name="gstRate"/>
@@ -54,16 +54,16 @@
   		</template>
   </cards>
   
-  <action-view name="action-view-create-new-invoice" title="Invoice" model="com.axelor.gst.app.Invoice">
+  <action-view name="action-product-view-create-new-invoice" title="Invoice" model="com.axelor.gst.app.Invoice">
   	<view type="form" name="invoice-form"/>
   	<context name="productId" expr="eval:__ids__"/>
   </action-view>
   
-  <action-record name="action-record-change-gst-rate" model="com.axelor.gst.app.Product">
+  <action-record name="action-product-record-change-gst-rate" model="com.axelor.gst.app.Product">
   	<field name="gstRate" expr="eval:category.gstRate"/>
   </action-record>
   
-  <action-report output="product-${date}${time}" name="action-report-print-product-details" design="product.rptdesign" format="pdf">
+  <action-report output="product-${date}${time}" name="action-product-report-print-product-details" design="product.rptdesign" format="pdf">
   	<param name="logoUrl" expr="call:com.axelor.gst.controller.InvoiceController:getLogoUrl()"/>
   	<param name="companyId" expr="eval:__repo__(Company).all().fetchOne().id"/>
   	<param name="productIds" expr="call:com.axelor.gst.controller.ProductController:getProductIds(_ids)"/>

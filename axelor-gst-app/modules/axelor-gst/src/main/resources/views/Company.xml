@@ -20,10 +20,10 @@
   			<editor>
   				<field name="name"/>
   				<field name="type"/>
-  				<field name="primaryPhone"/>
-  				<field name="secondaryPhone"/>
-  				<field name="primaryEmail"/>
-  				<field name="secondaryEmail"/>
+  				<field name="primaryPhone" widget="phone" x-preferred-countries="IN FR"/>
+  				<field name="secondaryPhone" widget="phone" x-preferred-countries="IN FR"/>
+  				<field name="primaryEmail" widget="email"/>
+  				<field name="secondaryEmail" widget="email"/>
   			</editor>
   		</field>
   	</panel>

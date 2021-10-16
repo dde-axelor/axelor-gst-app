@@ -11,7 +11,7 @@
   	<dashlet  colSpan="12" action="invoice.older"/>
   </dashboard>
   
-   <chart name="unpaid-invoice-per-customer-chart" title="Unpaid invoices per customer" onInit="action-method-set-dummy-field-for-chart">
+   <chart name="unpaid-invoice-per-customer-chart" title="Unpaid invoices per customer" onInit="action-dashboard-method-set-dummy-field">
   	<search-fields>
   		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
   		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
@@ -67,7 +67,7 @@
   </chart>
   
   
-   <chart name="paid-invoice-per-category-per-product" title="Paid invoices per category per product" onInit="action-method-set-dummy-field-for-chart">
+   <chart name="paid-invoice-per-category-per-product" title="Paid invoices per category per product" onInit="action-dashboard-method-set-dummy-field">
   	<search-fields>
   		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
   		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
@@ -97,7 +97,7 @@
   	<domain>self.status='validated' and self.invoiceDate &lt; CURRENT_DATE()-30</domain>
   </action-view>
   
-    <action-record name="action-method-set-dummy-field-for-chart" model="com.axelor.gst.app.Invoice">
+   <action-record name="action-dashboard-method-set-dummy-field" model="com.axelor.gst.app.Invoice">
   	<field name="fromDate" expr="#{LocalDateTime.now().minusDays(LocalDateTime.now().getDayOfMonth()-1)}"/>
   	<field name="toDate" expr="eval:__datetime__"/>
   </action-record>

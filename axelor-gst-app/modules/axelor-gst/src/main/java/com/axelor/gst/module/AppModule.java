@@ -1,10 +1,6 @@
 package com.axelor.gst.module;
 
 import com.axelor.app.AxelorModule;
-import com.axelor.gst.controller.InvoiceController;
-import com.axelor.gst.controller.InvoiceLineController;
-import com.axelor.gst.controller.PartyController;
-import com.axelor.gst.controller.SequenceController;
 import com.axelor.gst.service.InvoiceLineService;
 import com.axelor.gst.service.InvoiceLineServiceImplementation;
 import com.axelor.gst.service.InvoiceService;

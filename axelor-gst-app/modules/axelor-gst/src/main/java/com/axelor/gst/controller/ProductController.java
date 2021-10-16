@@ -23,9 +23,7 @@ public class ProductController {
 			
 			for(Product p:list) {
 				
-				String s=Long.toString(p.getId());
-				
-				str+=s;
+				str+=Long.toString(p.getId());
 				
 				if(list.indexOf(p)!=list.size()-1) 
 					str+=",";
@@ -35,9 +33,7 @@ public class ProductController {
 			
 			for(Integer id:ids) {
 				
-				String s=Integer.toString(id);
-				
-				str+=s;
+				str+=Integer.toString(id);
 				
 				if(ids.indexOf(id)!=ids.size()-1) 
 					str+=",";

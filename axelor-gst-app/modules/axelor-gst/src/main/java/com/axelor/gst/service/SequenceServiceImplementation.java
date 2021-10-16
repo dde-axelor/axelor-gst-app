@@ -39,7 +39,12 @@ public class SequenceServiceImplementation implements SequenceService {
 				nextNumber=prefix;
 			
 			for(int i=0;i<padding;i++) 
-				nextNumber=nextNumber.concat("0");	
+			{
+				if(i==padding-1)
+					nextNumber=nextNumber.concat("1");
+				else
+					nextNumber=nextNumber.concat("0");
+			}
 			
 			
 			if(suffix!=null)
@@ -66,27 +71,24 @@ public class SequenceServiceImplementation implements SequenceService {
 	@Override
 	public String getPaddingString(String seq,int padding) {
 		
-		String pad="";
+		StringBuilder sb=new StringBuilder();
 		for(int i=0;i<seq.length();i++) {
-			
-			if((int) seq.charAt(i)>=48 && (int) seq.charAt(i)<=57) 
-				pad=pad+seq.charAt(i);
-		}
-		
-		if(pad.length()>padding) {
-			
-			for(int j=0;j<pad.length();j++) {
-				
-				if(pad.length()-padding<=j)
-					pad=pad.replace(pad.charAt(j), pad.charAt(j+1));
+			if( seq.charAt(i)>='0' && seq.charAt(i)<='9') {
+				sb.append(seq.charAt(i));
 			}
 		}
-		else if(pad.length()<padding){
+		
+		int length=sb.length();
+		
+		if(length>padding) 
+				sb.delete(0, length-padding);
+
+		else if(padding>length){
 			
-			for(int j=0;j<padding-pad.length();j++) 
-				pad="0"+pad;
+			for(int j=0;j<padding-length;j++) 
+				sb.insert(0,"0");			
 		}
-		return pad;
+		return sb.toString();
 	}
 
 	
@@ -95,16 +97,17 @@ public class SequenceServiceImplementation implements SequenceService {
 	@Override
 	public String incrementedSequence(Sequence sequence) {
 		
-		String pad=getPaddingString(sequence.getNextNumber(),sequence.getPadding());
+		String	nextSequence=sequence.getNextNumber();
+		
+		String pad=getPaddingString(nextSequence,sequence.getPadding());
 		
 		String incremented="";
 		
-		String s=Integer.toString(Integer.parseInt(pad)+1);
+		String str=Integer.toString(Integer.parseInt(pad)+1);
 		
-		for(int i=0;i<pad.length()-s.length();i++)
+		for(int i=0;i<pad.length()-str.length();i++)
 			incremented+="0";
-		
-		incremented+=s;
+		incremented+=str;
 		
 		if(sequence.getPrefix()!=null && sequence.getSuffix()!=null) 
 			incremented=sequence.getPrefix()+incremented+sequence.getSuffix();
@@ -119,7 +122,7 @@ public class SequenceServiceImplementation implements SequenceService {
 		
 		seqRepo.save(sequence);
 		
-		return incremented;
+		return nextSequence;
 	}
 
 }

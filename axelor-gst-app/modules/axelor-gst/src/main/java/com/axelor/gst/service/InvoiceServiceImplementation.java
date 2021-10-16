@@ -128,9 +128,7 @@ public class InvoiceServiceImplementation implements InvoiceService {
 			
 			invoiceLine.setHsbn(i.getHsbn());
 			
-			String code="["+i.getCode()+"] "+i.getName();
-			
-			invoiceLine.setItem(code);
+			invoiceLine.setItem("["+i.getCode()+"] "+i.getName());
 			
 			invoiceLine.setNetAmount(i.getSalePrice());
 			

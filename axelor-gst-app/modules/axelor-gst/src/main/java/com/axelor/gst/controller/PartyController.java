@@ -19,7 +19,7 @@ public class PartyController {
 		}catch(Exception e)
 		{
 			
-			resp.addError("reference", "No sequence is specified for this model");
+			resp.addError("reference", "No sequence is specified");
 		}
 	}
 }
