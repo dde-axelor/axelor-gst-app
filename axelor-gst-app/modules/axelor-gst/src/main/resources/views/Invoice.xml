@@ -40,7 +40,7 @@
   	</panel>
   	<panel title="Invoice">
   		<field name="status" readonly="true" widget="NavSelect" colSpan="8"/>
-  		<field name="company" onChange="action-invoice-group-for-change-amounts"/>
+  		<field name="company" onChange="action-invoice-group-for-change-amounts" required="true"/>
   		<field name="reference"/>
   		<field name="invoiceDate"/>
   		<field name="priority"/>
@@ -61,11 +61,17 @@
   <kanban columnBy="status" model="com.axelor.gst.app.Invoice" sequenceBy="priority" title="Invoices" name="invoice-kanban">
   	<field name="company"/>
   	<field name="party"/>
+  	<field name="invoiceDate"/>
+  	<field name="grossAmount"/>
+  	<field name="reference"/>
   	<template>
   		<![CDATA[
   			<div style="text-align:center;">
-  				Company: {{company.name}}<br>
-  				Party: {{party.name}}
+  				<h3>{{company.name}}</h3>
+  				Customer: {{party.name}}<br>
+  				Reference: {{reference}}<br>
+  				Invoice Date: {{invoiceDate}}<br>
+  				Total Amount: {{grossAmount}}
   			</div>
   		]]>
   	</template>
@@ -80,10 +86,6 @@
   <action-attrs name="action-invoice-attr-check-null-values">
   	<attribute name="readonly" for="invoiceItem" expr="true" if="invoiceAddress==null || company==null"/>
   	<attribute name="readonly" for="invoiceItem" expr="false" if="invoiceAddress!=null &amp;&amp; company!=null"/>
-  </action-attrs>
-  
-  <action-attrs name="action-invoice-attr-set-party-contact">
-  	<attribute name="value" for="partyContact" expr="eval:party.contact"/>
   </action-attrs>
   
   <action-attrs name="action-invoice-attr-set-default-value">
@@ -141,7 +143,6 @@
   <action-group name="action-invoice-group-on-new-from">
   	<action name="action-invoice-attr-set-default-value"/>
   	<action name="action-invoice-method-set-values-from-product"  if="productId!=null"/>
-  	<action name="action-invoice-attr-check-null-values"/>
   </action-group>
   
   <action-group name="action-invoice-group-for-change-amounts">

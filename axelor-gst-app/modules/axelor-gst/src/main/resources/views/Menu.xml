@@ -105,7 +105,7 @@
   	<view type="form" name="invoice-form"/>
   	<view type="kanban" name="invoice-kanban"/>
   	<domain>self.status=:status</domain>
-  	<context name="status" expr="default"/>
+  	<context name="status" expr="draft"/>
   </action-view>
   
   <menuitem title="Validated Invoice" name="menu-validated-invoice" parent="menu-invoice" action="invoice.validated"/>
