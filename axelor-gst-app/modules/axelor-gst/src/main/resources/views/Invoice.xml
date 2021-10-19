@@ -90,7 +90,7 @@
   
   <action-attrs name="action-invoice-attr-set-default-value">
   	<attribute name="value" for="invoiceDate" expr="eval:__datetime__"/>
-  	<attribute name="value" for="company" expr="eval:__repo__(Company).all().fetchOne()"/>
+  	<attribute name="value" for="company" expr="eval:__user__.company"/>
   </action-attrs>
   
   <action-attrs name="action-invoice-attr-check-value">
