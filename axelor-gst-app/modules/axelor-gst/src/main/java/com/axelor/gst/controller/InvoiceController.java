@@ -1,7 +1,12 @@
 package com.axelor.gst.controller;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import com.axelor.app.AppSettings;
 import com.axelor.gst.app.Invoice;
@@ -86,7 +91,7 @@ public class InvoiceController {
 		try {
 			resp.setValue("reference", sequence.getNextSequence("Invoice"));
 			
-		}catch(Exception e) {
+		}catch(NullPointerException e) {
 			
 			resp.addError("reference", "No sequence is specified for this model");
 		}
@@ -105,6 +110,39 @@ public class InvoiceController {
 		Invoice invoice=req.getContext().asType(Invoice.class);
 		
 		resp.setValue("invoiceItem", service.invoiceItemAmounts(invoice));
+	}
+	
+	
+	public void getChartData(ActionRequest req,ActionResponse resp) {
+		LocalDate fromDate= LocalDate.parse(req.getContext().get("fromDate").toString(), DateTimeFormatter.ISO_DATE_TIME);
+		LocalDate toDate= LocalDate.parse(req.getContext().get("toDate").toString(), DateTimeFormatter.ISO_DATE_TIME);
+		
+		List<Map<String, Object>> dataList=service.getUnpaidInvoiceData(fromDate, toDate);
+		resp.setData(dataList);
+		
+	}
+	
+	public void getCustomerNo(ActionRequest req,ActionResponse resp) {
+		
+		List<Map<String, Object>> customerList=service.getCustomerPerState();
+		resp.setData(customerList);
+	}
+	
+	public void getGrossAmount(ActionRequest req,ActionResponse resp) {
+		
+		List<Map<String, Object>> amountList=service.getAmountsPerStatus();
+		resp.setData(amountList);
+	}
+
+	public void getCategoryPerProduct(ActionRequest req,ActionResponse resp) {
+		LocalDateTime fromDate= LocalDateTime.parse(req.getContext().get("fromDate").toString(), DateTimeFormatter.ISO_DATE_TIME);
+		LocalDateTime toDate= LocalDateTime.parse(req.getContext().get("toDate").toString(), DateTimeFormatter.ISO_DATE_TIME);
+		
+		
+		List<Map<String, Object>> dataList=service.getPerCategory(fromDate, toDate);
+		System.out.println(dataList);
+		resp.setData(dataList);
+		
 	}
 
 }

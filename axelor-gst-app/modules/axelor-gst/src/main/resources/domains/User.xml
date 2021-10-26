@@ -6,7 +6,7 @@
   <module name="auth" package="com.axelor.auth.db"/>
   
   <entity name="User" cacheable="true">
-  	<many-to-one ref="com.axelor.gst.app.Company" name="company"/>
+  	<many-to-one ref="com.axelor.gst.app.Company" name="company" title="Company"/>
   </entity>
   
   

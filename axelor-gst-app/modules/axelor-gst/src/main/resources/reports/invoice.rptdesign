@@ -3265,7 +3265,21 @@ Invoice
                                     <text-property name="text">Reference:</text-property>
                                 </label>
                             </cell>
-                            <cell id="211"/>
+                            <cell id="211">
+                                <text-data id="241">
+                                    <property name="dataSet">Invoice</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">reference</property>
+                                            <text-property name="displayName">reference</text-property>
+                                            <expression name="expression" type="javascript">dataSetRow["reference"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <expression name="valueExpr">row["reference"]</expression>
+                                    <property name="contentType">html</property>
+                                </text-data>
+                            </cell>
                         </row>
                     </grid>
                 </cell>

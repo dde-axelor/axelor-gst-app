@@ -1,8 +1,17 @@
 package com.axelor.gst.service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import com.axelor.gst.app.Address;
 import com.axelor.gst.app.Contact;
@@ -12,9 +21,13 @@ import com.axelor.gst.app.Party;
 import com.axelor.gst.app.Product;
 import com.axelor.gst.app.repo.ProductRepository;
 import com.axelor.inject.Beans;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class InvoiceServiceImplementation implements InvoiceService {
 
+	@Inject
+	Provider<EntityManager> invoice;
 	
 	@Override
 	public boolean checkString(String s1, String s2) {
@@ -221,4 +234,98 @@ public class InvoiceServiceImplementation implements InvoiceService {
 		
 		return total;
 	}
+
+
+
+	@Override
+	public List<Map<String, Object>> getUnpaidInvoiceData(LocalDate fromDate, LocalDate toDate) {
+		EntityManager em=invoice.get();
+		Query query=em.createQuery("Select count(i) as total from Invoice i where i.status not in ('paid','cancelled') and date(i.invoiceDate) between :fd and :td group by i.party.name order by total");
+		query.setParameter("fd", fromDate);
+		query.setParameter("td", toDate);
+		Query q=em.createQuery("Select i.party.name as pname from Invoice i where i.status not in ('paid','cancelled') and date(i.invoiceDate) between :fd and :td group by i.party.name order by count(i)");
+		q.setParameter("fd", fromDate);
+		q.setParameter("td", toDate);
+		List<Object> countList=query.getResultList();
+		List<String> nameList=q.getResultList();
+		List<Map<String, Object>> dataList = new ArrayList<Map<String,Object>>();
+		for(int i=0;i<countList.size();i++) {
+			Map<String,Object> datamap=new HashMap<String, Object>();
+			datamap.put("pname", nameList.get(i));
+			datamap.put("total", countList.get(i));
+			dataList.add(datamap);
+		}
+		return dataList;
+	}
+
+
+
+	@Override
+	public List<Map<String, Object>> getCustomerPerState() {
+		EntityManager em=invoice.get();
+		Query q1=em.createQuery("Select count(i) from Invoice i group by i.invoiceAddress.state order by count(i)");
+		Query q2=em.createQuery("Select i.invoiceAddress.state.name from Invoice i group by i.invoiceAddress.state.name order by count(i)");
+		List<Object> countList=q1.getResultList();
+		List<Object> stateList=q2.getResultList();
+		List<Map<String, Object>> dataList = new ArrayList<Map<String,Object>>();
+		for(int i=0;i<countList.size();i++) {
+			Map<String,Object> datamap=new HashMap<String, Object>();
+			datamap.put("state", stateList.get(i));
+			datamap.put("total", countList.get(i));
+			dataList.add(datamap);
+		}
+		return dataList;
+	}
+
+
+
+	@Override
+	public List<Map<String, Object>> getAmountsPerStatus() {
+		EntityManager em=invoice.get();
+		Query q1=em.createQuery("Select sum(i.grossAmount) as amount From Invoice as i Group by i.status Order by amount");
+		Query q2=em.createQuery("Select i.status as status From Invoice as i Group by i.status Order by sum(i.grossAmount)");
+		List<Object> amountList=q1.getResultList();
+		List<Object> statusList=q2.getResultList();
+		List<Map<String, Object>> dataList = new ArrayList<Map<String,Object>>();
+		for(int i=0;i<amountList.size();i++) {
+			Map<String,Object> datamap=new HashMap<String, Object>();
+			datamap.put("status", statusList.get(i));
+			datamap.put("amount", amountList.get(i));
+			dataList.add(datamap);
+		}
+		return dataList;
+	}
+
+
+
+	@Override
+	public List<Map<String, Object>> getPerCategory(LocalDateTime fromDate, LocalDateTime toDate) {
+		EntityManager em=invoice.get();
+		Query q1=em.createQuery("Select count(i) from Invoice i,InvoiceLine il where i.id=il.invoice and i.status='paid' and i.invoiceDate between :fd and :td group by il.product  order by count(i)");
+		q1.setParameter("fd", fromDate);
+		q1.setParameter("td", toDate);
+		System.out.println(q1.getResultList());
+		Query q2=em.createQuery("Select il.product.name from Invoice i,InvoiceLine il where i.id=il.invoice and  i.status='paid' and i.invoiceDate between :fd and :td group by il.product.name order by count(i)");
+		q2.setParameter("fd", fromDate);
+		q2.setParameter("td", toDate);
+		System.out.println(q2.getResultList());
+		Query q3=em.createQuery("Select i.invoiceItem.product.category.name from Invoice i where i.status='paid' and i.invoiceDate between :fd and :td group by i.invoiceItem.product,i.invoiceItem.pruduct.category order by count(i)");
+		q3.setParameter("fd", fromDate);
+		q3.setParameter("td", toDate);
+		List<Object> countList=q1.getResultList();
+		List<Object> productList=q2.getResultList();
+		List<Object> categoryList=q3.getResultList();
+		List<Map<String, Object>> dataList = new ArrayList<Map<String,Object>>();
+		for(int i=0;i<countList.size();i++) {
+			Map<String,Object> datamap=new HashMap<String, Object>();
+			datamap.put("product", productList.get(i));
+			datamap.put("category", categoryList.get(i));
+			datamap.put("total", countList.get(i));
+			dataList.add(datamap);
+		}
+		System.out.println(dataList);
+		return dataList;
+	}
+	
+	
 }

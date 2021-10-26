@@ -34,7 +34,7 @@
   	</toolbar>
   	<panel sidebar="true">
   		<button onClick="save,action-invoice-record-change-status-draft,save" name="dratftBtn" title="Return To Draft" icon="fa-retweet" hideIf="status==&quot;draft&quot; || status==&quot;validated&quot; || status==&quot;paid&quot;"/>
-  		<button onClick="save,action-invoice-record-change-status-validated,action-invoice-method-set-reference,save" name="validateBtn" title="Validate" icon="fa-paper-plane" hideIf="status==&quot;validated&quot; || status==&quot;paid&quot; || status==&quot;cancelled&quot;"/>
+  		<button onClick="save,action-invoice-record-change-status-validated,action-invoice-method-set-reference" name="validateBtn" title="Validate" icon="fa-paper-plane" hideIf="status==&quot;validated&quot; || status==&quot;paid&quot; || status==&quot;cancelled&quot;"/>
   		<button onClick="save,action-invoice-record-change-status-paid,save" name="paidBtn" title="Paid" css="btn btn-success" icon="fa-check-square-o" hideIf="status==&quot;paid&quot; || status==&quot;draft&quot; || status==&quot;cancelled&quot;"/>
   		<button onClick="save,action-invoice-validate-on-cancel-alert,action-invoice-record-change-status-cancel,save" name="cancelBtn" title="Cancel" icon="fa-times" css="btn btn-danger" hideIf="status==&quot;cancelled&quot;"/>
   	</panel>

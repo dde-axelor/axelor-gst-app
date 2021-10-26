@@ -1,7 +1,10 @@
 package com.axelor.gst.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import com.axelor.gst.app.Address;
 import com.axelor.gst.app.Invoice;
@@ -21,4 +24,13 @@ public interface InvoiceService {
 	public  Object getAddress(Party p,String str);
 	
 	public BigDecimal getAmounts(List<InvoiceLine> il,String str);
+	
+	public List<Map<String,Object>> getUnpaidInvoiceData(LocalDate fromDate,LocalDate toDate);
+	
+	public List<Map<String,Object>> getPerCategory(LocalDateTime fromDate,LocalDateTime toDate);
+	
+	public List<Map<String,Object>> getCustomerPerState();
+	
+	public List<Map<String,Object>> getAmountsPerStatus();
+	
 }

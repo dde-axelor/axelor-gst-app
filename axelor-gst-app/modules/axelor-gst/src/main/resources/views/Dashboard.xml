@@ -11,24 +11,24 @@
   	<dashlet  colSpan="12" action="invoice.older"/>
   </dashboard>
   
-   <chart name="unpaid-invoice-per-customer-chart" title="Unpaid invoices per customer" onInit="action-dashboard-method-set-dummy-field">
+   <chart name="invoice-unpaid-customer-chart" title="Unpaid invoices per customer" onInit="action-dashboard-method-set-dummy-field">
   	<search-fields>
-  		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
-  		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
+  		<field name="fromDate" type="date" widget="required" x-required="true" title="From"/>
+  		<field name="toDate" type="date" widget="required" x-required="true" title="To"/>
   	</search-fields>
   	<dataset type="jpql">
   		<![CDATA[
   			Select p.name as customer,count(i) as total 
   			from Invoice as i,Party as p
-  			where i.party = p.id and i.status not in ('paid','cancelled') and i.invoiceDate between date(:fromDate) and date(:toDate)
+  			where i.party = p.id and i.status not in ('paid','cancelled') and date(i.invoiceDate) between date(:fromDate) and date(:toDate)
   			group by p
   		]]>
   	</dataset>
   	<category key="customer" title="Customers"/>
-  	<series key="total" type="bar" title=""/>
+  	<series key="total" type="bar" title="No. of Unpaid Invoices"/>
   </chart>
   
-  <chart name="customer-per-state-chart" title="Customers per state">
+  <chart name="invoice-customer-per-status-chart" title="Customers per state">
   	<dataset type="jpql">
   		<![CDATA[
   			Select s.name as state,count(p) as total
@@ -69,12 +69,12 @@
   
    <chart name="paid-invoice-per-category-per-product" title="Paid invoices per category per product" onInit="action-dashboard-method-set-dummy-field">
   	<search-fields>
-  		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
-  		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
+  		<field name="fromDate" type="date" widget="required" x-required="true" title="From"/>
+  		<field name="toDate" type="date" widget="required" x-required="true" title="To"/>
   	</search-fields>
   	<dataset type="sql">
   		<![CDATA[
-			select count(*) as total,ap.name as pname,apc.name as cname
+			select count(ai) as total,ap.name as pname,apc.name as cname
   			from axelor_invoice ai 
   			left join axelor_invoice_line ail 
   				on ai.id=ail.invoice 
@@ -82,7 +82,7 @@
   				on ap.id=ail.product 
   			left join axelor_product_category apc 
   				on apc.id=ap.category 
-  			where ai.status='paid' and ai.invoice_date between date(:fromDate) and date(:toDate)
+  			where ai.status='paid' and date(ai.invoice_date) between date(:fromDate) and date(:toDate)
   			group by apc.id,ap.id;
   		]]>
   	</dataset>

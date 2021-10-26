@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+  
+  <dashboard name="dashboard-all-charts" title="Welcome">
+  	<dashlet action="chart:unpaid-per-customer"/>
+  	<dashlet action="chart:chart-view-customer-per-state"/>
+  	<dashlet action="chart:chart-view-invoice-per-status-amount"/>
+  	<!-- <dashlet action="chart:chart-view-paid-invoice-per-category-per-product"/> -->
+  </dashboard>
+  
+  <chart name="unpaid-per-customer" title="Unpaid customers" onInit="action-set-dummy-fields">
+ 	 <search-fields>
+  		<field name="fromDate" type="date" widget="required" x-required="true" title="From"/>
+  		<field name="toDate" type="date" widget="required" x-required="true" title="To"/>
+  	</search-fields>
+  	
+  	<dataset type="rpc">
+  		com.axelor.gst.controller.InvoiceController:getChartData
+  	</dataset>
+  	
+  	<category key="pname" type="text"/>
+  	<series key="total" type="bar"/>
+  
+  </chart>
+  
+  <chart name="chart-view-customer-per-state" title="Customers per state">
+  	<dataset type="rpc">
+  		com.axelor.gst.controller.InvoiceController:getCustomerNo
+  	</dataset>
+  	<category key="state"/>
+  	<series key="total" type="pie" />
+  </chart>
+  
+   <chart name="chart-view-invoice-per-status-amount" title="Amounts per invoice status ">
+  	<dataset type="rpc">
+  		com.axelor.gst.controller.InvoiceController:getGrossAmount
+  	</dataset>
+  	<category key="status" title="Status"/>
+  	<series key="amount" type="bar" title="Amounts"/>
+  </chart>
+  
+   <chart name="chart-view-paid-invoice-per-category-per-product" title="Paid invoices per category per product" onInit="action-set-dummy-fields">
+  	<search-fields>
+  		<field name="fromDate" type="datetime" widget="required" x-required="true" title="From"/>
+  		<field name="toDate" type="datetime" widget="required" x-required="true" title="To"/>
+  	</search-fields>
+  	<dataset type="rpc">
+  		com.axelor.gst.controller.InvoiceController:getCategoryPerProduct
+  	</dataset>
+  	<category key="product" title="Products"/>
+  	<series key="total" type="bar" groupBy="category" title="No. of Invoices"/>
+  </chart> 
+  
+  <action-record name="action-set-dummy-fields" model="com.axelor.gst.app.Invoice">
+  	<field name="fromDate" expr="#{LocalDateTime.now().minusDays(LocalDateTime.now().getDayOfMonth()-1)}"/>
+  	<field name="toDate" expr="eval:__datetime__"/>
+  </action-record>
+  
+ </object-views>
